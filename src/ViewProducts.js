@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button, InputGroup, FormControl, Container } from 'react-bootstrap';
 
-const ViewProducts = ({ products, onEdit, onDelete }) => {
-    const [selectedProduct, setSelectedProduct] = React.useState(null);
-    const [isEditing, setIsEditing] = React.useState(false);
+const ViewProducts = ({ onDelete }) => {
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [data, setData] = useState([]);
+
+
+    //FETCH ALL THE PRODUCT FROM OUR BACKEND
+    useEffect(() => {
+        const fetchData = () => {
+            fetch('http://127.0.0.1:8000/api/products/')
+                .then(response => response.json())
+                .then(data => setData(data)) 
+                .catch(error => console.error('Error fetching data:', error));
+        };
+        fetchData();
+    }, []);
 
     const handleEditClick = (product) => {
         setSelectedProduct(product);
-        setIsEditing(true); // Set editing mode to true
+        setIsEditing(true);
     };
 
     return (
@@ -28,7 +41,7 @@ const ViewProducts = ({ products, onEdit, onDelete }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {products.map(product => (
+                    {data.map(product => (
                         <tr key={product.id}>
                             <td>{product.barcode}</td>
                             <td>{product.description}</td>
@@ -36,11 +49,12 @@ const ViewProducts = ({ products, onEdit, onDelete }) => {
                             <td>{product.quantity}</td>
                             <td>{product.category}</td>
                             <td>
-                            <Button variant="warning" onClick={() => {
-                                setSelectedProduct(product); // Set the product to edit
-                                setIsEditing(true); // Open edit mode}}>Edit</Button>
-                            }}>Edit</Button>
-                                <Button variant="danger" onClick={() => onDelete(product.id)}>Delete</Button>
+                                <Button variant="warning" onClick={() => handleEditClick(product)}>
+                                    Edit
+                                </Button>
+                                <Button variant="danger" onClick={() => onDelete(product.id)}>
+                                    Delete
+                                </Button>
                             </td>
                         </tr>
                     ))}
