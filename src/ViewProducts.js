@@ -5,6 +5,7 @@ const ViewProducts = ({ onDelete }) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [data, setData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
 
     //FETCH ALL THE PRODUCT FROM OUR BACKEND
@@ -23,11 +24,21 @@ const ViewProducts = ({ onDelete }) => {
         setIsEditing(true);
     };
 
+
+    //FILTERED BY PROUDCT BARCODE
+    const filteredProducts = data.filter(product =>
+        product.barcode.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <Container>
             <h2>Product List</h2>
             <InputGroup className="mb-3">
-                <FormControl placeholder="Search Products" />
+                <FormControl
+                        placeholder="Search Products"
+                        value={searchQuery} 
+                        onChange={(e) => setSearchQuery(e.target.value)} 
+                    />
             </InputGroup>
             <Table striped bordered hover>
                 <thead>
@@ -41,7 +52,7 @@ const ViewProducts = ({ onDelete }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map(product => (
+                    {filteredProducts.map(product => (
                         <tr key={product.id}>
                             <td>{product.barcode}</td>
                             <td>{product.description}</td>
